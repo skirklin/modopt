@@ -4,30 +4,30 @@ import sys
 import itertools
 import numpy as np
 from collections import *
+import time
 
 class Optimizer:
     """
     Optimizer objects hold all of the information and instructions for fitting
     the potential.
 
-    [Fit Options]
-    -fit_size[default=20]: how many data points to fit to
-    -test_size[default=0]: how many data points to test against independently
-    -pop_size[default=100]: how many organisms per generation
-    -weights[default={'energy':10, 'stress':1, 'force':1}]: a dictionary
-    containing the relative weights of force, stress and energy errors
+    Fit Options
+    ===========
+    fit_size[default=20]: how many data points to fit to
+    test_size[default=0]: how many data points to test against independently
+    pop_size[default=100]: how many organisms per generation
+    weights[default={'energy':10, 'stress':1, 'force':1}]: a dictionary
+        containing the relative weights of force, stress and energy errors
 
-    [GA Options]
-    -tourn_size[default=5]: how many organisms to compete for procreation
-    -f_replace[default=1.0]: how many organisms to keep back from the previous
-    generation, to 'seed' the next one
-    -p_mutate[default=0.1]: chance of mutating any given gene during breeding.
-    -first_generation_factor[default=500]: size of the first generation to get a
-    pool of reasonably good structures to start with.
+    GA Options
+    ==========
+    tourn_size[default=5]: how many organisms to compete for procreation
+    f_replace[default=1.0]: how many organisms to keep back from the previous
+        generation, to 'seed' the next one
+    p_mutate[default=0.1]: chance of mutating any given gene during breeding.
+    first_generation_factor[default=500]: size of the first generation to get a
+        pool of reasonably good structures to start with.
 
-    [Extras]
-    -rescale_threshold[default=0.05]
-    -sliding_threshold[default=0.25]
     """
 
     fit_size = 20
@@ -38,7 +38,6 @@ class Optimizer:
     first_generation_factor = 500
     rescale_threshold = 0.05
     sliding_threshold = 0.25
-
 
     def __init__(self, model=None, train=None, test=None):
         if model is None or train is None:
