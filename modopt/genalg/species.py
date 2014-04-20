@@ -1,16 +1,14 @@
-# modopt/genalg/population.py
+# modopt/genalg/species.py
 
 import random
+import json
 
 from organism import Organism
+from genome import Genome
 
-class Population:
-    """
-    A collection of Organisms.
-
-    """
+class Species(object):
     ### population options
-    pop_size = 0.0
+    pop_size = 100
     organism = Organism
     f_replace = 0.5
     
@@ -20,33 +18,39 @@ class Population:
     ### Selection
     tourn_size = 4
     
-
-    def __init__(self):
-        self.organisms = [ self.organism() for i in range(self.pop_size) ]
-
-    def __getitem__(self, index):
-        return self.organisms[index]
+    def __init__(self, genome):
+        self.genome = genome
+        self.population = [ self.spawn_organism() for i in range(self.pop_size) ]
 
     def __len__(self):
-        return len(self.organisms)
+        return len(self.population)
+
+    def __getitem__(self, index):
+        return self.population[index]
 
     def sort(self):
-        self.organsims = sorted(self.organisms, key=lambda org: org.fitness)
-        
+        self.population = sorted(self.population, key=lambda x: x.fitness)
+
     def best(self):
         self.sort()
         return self[0]
 
-    def cull_the_weak(self, n_survivors):
-        self.sort()
-        return self[:n_survivors]
-        
+    def spawn_organism(self):
+        org = Organism()
+        org.species = self
+        org.genes = self.genome.get_genes()
+
     def select(self, method='roulette'):
         if method == 'tournament':
             return self.tournament_select()
         elif method == 'roulette':
             return self.roulette_select()
 
+    def cull_the_weak(self, n_survivors):
+        self.sort()
+        self.population = self.population[:n_survivors]
+        return self.population
+    
     def tournament_select(self):
         breeders = []
         for i in range(self.tourn_size):
@@ -62,15 +66,10 @@ class Population:
             v += org.fitness
             if v > score:
                 return org
-                
+
     def next_generation(self):
-        new_pop = Population()
-        for org in self:
-            org.fitness_function()
-        
-        while len(new_pop) < len(self):
-            return
-    
+        raise NotImplementedError
+
     def create_generation(self):
         self.sort()
         max_ind = self.pop_size*(1-self.f_replace)
@@ -82,6 +81,4 @@ class Population:
             child = parent1.mate_with(parent2)
             child.mutate(self.p_mutate)
             gen.append(child)
-
         return gen
-        

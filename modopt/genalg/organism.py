@@ -1,38 +1,42 @@
 # modopt/genalg/organism.py
 
 import random
+import json
 
 class Organism(object):
     """
     A collection of Genes.
-
     """
-    genes = []
 
-    def __init__(self):
-        self.fitness = 0.0
-        self.genotype = [ gene.mutate() for gene in self.genes ]
-
+    fitness = 0.0
     def mutate(self, p_mutate=0.1):
-        genes = []
-        for gene in self.genes:
-            if random.random() < p_mutate:
-                genes.append(gene.mutate())
-            else:
-                genes.append(gene)
+        for gene, current in self.genes.items():
+            if random.random() > p_mutate:
+                continue
+            self.genes[gene] = random.choice(self.species.genome[gene])
         self.genes = genes
 
     def mate(self, mate):
         child = Organism()
-        genes = []
-        for g1, g2 in zip(self.genes, mate.genes):
+        child.genes = dict(self.genes)
+        for gene in self.genes:
             if random.random() < 0.5:
-                genes.append(g1)
-            else:
-                genes.append(g2)
-        child.genes = genes
+                child.genes[gene] = mate.genes[gene]
         return child
         
-    def fitness_function(self):
-        self.fitness = 1.0
-        return self.fitness
+    def write(self):
+        genes = json.dumps(self.genes)
+        genome = self.species.genome.write()
+        return genes, genome
+
+    @staticmethod
+    def read(data):
+        self.genes = json.loads(data)
+
+    def fitness_function(self, **kwargs):
+        """
+        Placeholder for a custom function that takes an organisms genes as
+        kwargs, and returns a fitness value (float).
+        """
+        raise NotImplementedError("Must specify a fitness function.")
+
