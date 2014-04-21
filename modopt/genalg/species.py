@@ -1,5 +1,6 @@
 # modopt/genalg/species.py
 
+from __future__ import division
 import random
 import json
 import logging
@@ -114,12 +115,23 @@ class Species(object):
     def track_progress(self):
         return True
 
+    def recent_error(self, n=10):
+        if len(self.history) < n:
+            return 1.0
+        return sum(self.history[-n:])/n - self.history[-1]
+
     history = []
-    def evolve(self, limit=100):
+    def evolve(self, limit=10000):
         self.evaluate()
         self.history.append(self.best)
 
-        for i in range(limit):
+        i = 0
+        while self.recent_error() > 0.0:
             self.next_generation()
             self.evaluate()
             self.track_progress()
+            i += 1
+            if i > limit:
+                break
+        else:
+            print 'converged after %d steps' % i

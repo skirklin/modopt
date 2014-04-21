@@ -28,7 +28,9 @@ genome = {'a':np.linspace(0,10,1000),
 
 genome = Genome(genome)
 spec = Species(genome, objective=objective)
-spec.evolve(200)
+spec.f_replace = 0.9
+spec.p_mutate = 0.4
+spec.evolve()
 
 print 'found:'
-print spec.best
+print spec.best, spec.best.fitness
